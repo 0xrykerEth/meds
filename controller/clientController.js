@@ -1,6 +1,5 @@
 const { Client } = require('../models');
 
-// Get all clients for a user
 const getAllClients = async (req, res) => {
     try {
         const clients = await Client.findAll({
@@ -23,7 +22,6 @@ const getAllClients = async (req, res) => {
     }
 };
 
-// Get single client
 const getClient = async (req, res) => {
     try {
         const { id } = req.params;
@@ -54,7 +52,6 @@ const getClient = async (req, res) => {
     }
 };
 
-// Create new client
 const createClient = async (req, res) => {
     try {
         const { name, email, phone, address, company, tax_id, notes } = req.body;
@@ -86,7 +83,6 @@ const createClient = async (req, res) => {
     }
 };
 
-// Update client
 const updateClient = async (req, res) => {
     try {
         const { id } = req.params;
@@ -129,7 +125,6 @@ const updateClient = async (req, res) => {
     }
 };
 
-// Delete client (soft delete)
 const deleteClient = async (req, res) => {
     try {
         const { id } = req.params;
