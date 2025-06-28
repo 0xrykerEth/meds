@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{invoice.invoice_number}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #2E8B57;
+            padding-bottom: 20px;
+        }
+
+        .company-info h1 {
+            color: #2E8B57;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .company-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .invoice-info {
+            text-align: right;
+        }
+
+        .invoice-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2E8B57;
+            margin-bottom: 10px;
+        }
+
+        .invoice-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .client-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .bill-to {
+            flex: 1;
+        }
+
+        .bill-to h3 {
+            color: #2E8B57;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .client-details {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .invoice-summary {
+            flex: 1;
+            text-align: right;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-label {
+            font-weight: bold;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            background-color: #2E8B57;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .items-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .total-section {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .total-row.grand-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2E8B57;
+            border-top: 2px solid #2E8B57;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .notes-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .notes-section h3 {
+            color: #2E8B57;
+            margin-bottom: 10px;
+        }
+
+        .notes-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-draft { background-color: #f0f0f0; color: #666; }
+        .status-sent { background-color: #e3f2fd; color: #1976d2; }
+        .status-paid { background-color: #e8f5e8; color: #2e7d32; }
+        .status-overdue { background-color: #ffebee; color: #c62828; }
+        .status-cancelled { background-color: #fafafa; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header">
+            <div class="company-info">
+                <h1>{{user.company_name}}</h1>
+                <div class="company-details">
+                    {{#if user.name}}{{user.name}}<br>{{/if}}
+                    {{#if user.address}}{{user.address}}<br>{{/if}}
+                    {{#if user.phone}}Phone: {{user.phone}}<br>{{/if}}
+                    {{#if user.email}}Email: {{user.email}}{{/if}}
+                </div>
+            </div>
+            <div class="invoice-info">
+                <div class="invoice-number">INVOICE</div>
+                <div class="invoice-details">
+                    <strong>Invoice #:</strong> {{invoice.invoice_number}}<br>
+                    <strong>Issue Date:</strong> {{invoice.issue_date}}<br>
+                    <strong>Due Date:</strong> {{invoice.due_date}}<br>
+                    <strong>Status:</strong> 
+                    <span class="status-badge status-{{invoice.status}}">{{invoice.status}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="client-section">
+            <div class="bill-to">
+                <h3>Bill To:</h3>
+                <div class="client-details">
+                    <strong>{{client.name}}</strong><br>
+                    {{#if client.company}}{{client.company}}<br>{{/if}}
+                    {{#if client.address}}{{client.address}}<br>{{/if}}
+                    {{#if client.phone}}Phone: {{client.phone}}<br>{{/if}}
+                    {{#if client.email}}Email: {{client.email}}{{/if}}
+                </div>
+            </div>
+            <div class="invoice-summary">
+                <div class="summary-item">
+                    <span class="summary-label">Subtotal:</span>
+                    <span>${{invoice.subtotal}}</span>
+                </div>
+                {{#if invoice.tax_amount}}
+                <div class="summary-item">
+                    <span class="summary-label">Tax ({{invoice.tax_rate}}%):</span>
+                    <span>${{invoice.tax_amount}}</span>
+                </div>
+                {{/if}}
+                {{#if invoice.discount_amount}}
+                <div class="summary-item">
+                    <span class="summary-label">Discount ({{invoice.discount_rate}}%):</span>
+                    <span>-${{invoice.discount_amount}}</span>
+                </div>
+                {{/if}}
+                <div class="summary-item grand-total">
+                    <span class="summary-label">Total:</span>
+                    <span>${{invoice.total_amount}}</span>
+                </div>
+            </div>
+        </div>
+
+        {{#if items.length}}
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each items}}
+                <tr>
+                    <td>{{description}}</td>
+                    <td>{{quantity}}</td>
+                    <td>${{unit_price}}</td>
+                    <td>${{amount}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+
+        {{#if invoice.notes}}
+        <div class="notes-section">
+            <h3>Notes:</h3>
+            <div class="notes-content">
+                {{invoice.notes}}
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if invoice.terms_conditions}}
+        <div class="notes-section">
+            <h3>Terms & Conditions:</h3>
+            <div class="notes-content">
+                {{invoice.terms_conditions}}
+            </div>
+        </div>
+        {{/if}}
+
+        <div class="footer">
+            <p>Generated on {{generated_date}} | InvoiceGen - Professional Invoice Generator</p>
+        </div>
+    </div>
+</body>
+</html> 

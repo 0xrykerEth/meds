@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvoiceGen - Professional Invoice Generator</title>
+    <style>
+        :root {
+            --primary-color: #2E8B57;
+            --secondary-color: #20B2AA;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            line-height: 1.6;
+            background: #fff;
+            color: var(--dark-color);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            overflow: hidden;
+            padding: 0 2rem;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 600;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eaeaea;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        header .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header .nav-links li {
+            margin-left: 20px;
+        }
+
+        header .nav-links a {
+            color: var(--dark-color);
+            font-weight: 400;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: #fff;
+        }
+
+
+        /* Hero Section */
+        #hero {
+            background: var(--light-color);
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        #hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Features Section */
+        #features {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        #features h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .feature-card img {
+            width: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* How It Works Section */
+        #how-it-works {
+            background: var(--light-color);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        #how-it-works h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            max-width: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .step span {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .step h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Testimonials Section */
+        #testimonials {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        #testimonials h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .testimonial-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            margin: 0 0 1rem 0;
+        }
+
+        .testimonial-card h4 {
+            margin: 0;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: #fff;
+            padding: 2rem 0;
+        }
+
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        footer .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        footer .footer-links li {
+            margin-left: 20px;
+        }
+
+        footer .footer-links a {
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header nav .container {
+                flex-direction: column;
+            }
+
+            header .nav-links {
+                margin-top: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                margin-bottom: 2rem;
+            }
+
+            footer .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            footer .footer-links {
+                margin-top: 1rem;
+            }
+
+            footer .footer-links li {
+                margin: 0 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="container">
+                <h1 class="logo">InvoiceGen</h1>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="http://localhost:3000/signup" class="btn btn-primary">Create Invoice</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h2>Create Professional Invoices in Minutes</h2>
+                <p>InvoiceGen helps you generate beautiful, professional invoices quickly and easily. Track payments, manage clients, and get paid faster.</p>
+                <a href="#" class="btn btn-secondary">Start Creating Invoices</a>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2>Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Professional Templates</h3>
+                        <p>Choose from multiple professional invoice templates that match your brand.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Client Management</h3>
+                        <p>Store and manage client information for quick invoice generation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Payment Tracking</h3>
+                        <p>Track invoice status, payments, and send automatic payment reminders.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works">
+            <div class="container">
+                <h2>How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <span>1</span>
+                        <h3>Add Client Details</h3>
+                        <p>Enter your client's information or select from saved clients.</p>
+                    </div>
+                    <div class="step">
+                        <span>2</span>
+                        <h3>Add Items & Services</h3>
+                        <p>List your products or services with quantities and rates.</p>
+                    </div>
+                    <div class="step">
+                        <span>3</span>
+                        <h3>Generate & Send</h3>
+                        <p>Create your invoice and send it to your client instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials">
+            <div class="container">
+                <h2>What Our Users Say</h2>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p>"InvoiceGen has streamlined my invoicing process completely. I can create professional invoices in minutes instead of hours!"</p>
+                        <h4>- Jennifer M., Freelance Designer</h4>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"The payment tracking feature is amazing. I always know which invoices are paid and which need follow-up."</p>
+                        <h4>- David R., Small Business Owner</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 InvoiceGen. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+</html>
