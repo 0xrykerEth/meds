@@ -2,7 +2,6 @@ const { Invoice, InvoiceItem, Client, User } = require('../models');
 const { Op } = require('sequelize');
 const pdfService = require('../services/pdfService');
 
-// Generate invoice number
 const generateInvoiceNumber = async (userId) => {
     const count = await Invoice.count({ where: { user_id: userId } });
     const date = new Date();
@@ -11,7 +10,7 @@ const generateInvoiceNumber = async (userId) => {
     return `INV-${year}${month}-${String(count + 1).padStart(4, '0')}`;
 };
 
-// Get all invoices for a user
+
 const getAllInvoices = async (req, res) => {
     try {
         const { page = 1, limit = 10, status, search } = req.query;
@@ -67,7 +66,6 @@ const getAllInvoices = async (req, res) => {
     }
 };
 
-// Get single invoice with items
 const getInvoice = async (req, res) => {
     try {
         const { id } = req.params;
@@ -110,7 +108,6 @@ const getInvoice = async (req, res) => {
     }
 };
 
-// Create new invoice
 const createInvoice = async (req, res) => {
     try {
         const {
@@ -125,7 +122,6 @@ const createInvoice = async (req, res) => {
             items
         } = req.body;
 
-        // Verify client belongs to user
         const client = await Client.findOne({
             where: { id: client_id, user_id: req.user.userId, is_active: true }
         });
@@ -137,10 +133,8 @@ const createInvoice = async (req, res) => {
             });
         }
 
-        // Generate invoice number
         const invoice_number = await generateInvoiceNumber(req.user.userId);
 
-        // Calculate totals
         let subtotal = 0;
         let total_tax = 0;
         let total_discount = 0;
@@ -156,7 +150,6 @@ const createInvoice = async (req, res) => {
         total_discount = (subtotal * discount_rate) / 100;
         const total_amount = subtotal + total_tax - total_discount;
 
-        // Create invoice
         const invoice = await Invoice.create({
             user_id: req.user.userId,
             client_id,
@@ -174,7 +167,6 @@ const createInvoice = async (req, res) => {
             payment_terms
         });
 
-        // Create invoice items
         if (items && items.length > 0) {
             for (const item of items) {
                 await InvoiceItem.create({
@@ -189,7 +181,6 @@ const createInvoice = async (req, res) => {
             }
         }
 
-        // Get complete invoice with items
         const completeInvoice = await Invoice.findOne({
             where: { id: invoice.id },
             include: [
@@ -220,7 +211,6 @@ const createInvoice = async (req, res) => {
     }
 };
 
-// Update invoice
 const updateInvoice = async (req, res) => {
     try {
         const { id } = req.params;
@@ -247,7 +237,6 @@ const updateInvoice = async (req, res) => {
             });
         }
 
-        // Update invoice
         await invoice.update({
             client_id: client_id || invoice.client_id,
             issue_date: issue_date || invoice.issue_date,
@@ -259,12 +248,9 @@ const updateInvoice = async (req, res) => {
             payment_terms: payment_terms || invoice.payment_terms
         });
 
-        // Update items if provided
         if (items && items.length > 0) {
-            // Delete existing items
             await InvoiceItem.destroy({ where: { invoice_id: id } });
 
-            // Create new items
             for (const item of items) {
                 await InvoiceItem.create({
                     invoice_id: id,
@@ -278,7 +264,6 @@ const updateInvoice = async (req, res) => {
             }
         }
 
-        // Recalculate totals
         const updatedItems = await InvoiceItem.findAll({ where: { invoice_id: id } });
         let subtotal = 0;
         updatedItems.forEach(item => {
@@ -296,7 +281,6 @@ const updateInvoice = async (req, res) => {
             total_amount
         });
 
-        // Get updated invoice
         const updatedInvoice = await Invoice.findOne({
             where: { id },
             include: [
@@ -327,12 +311,10 @@ const updateInvoice = async (req, res) => {
     }
 };
 
-// Generate PDF for invoice
 const generatePDF = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Get invoice with all related data
         const invoice = await Invoice.findOne({
             where: { id, user_id: req.user.userId },
             include: [
@@ -354,20 +336,16 @@ const generatePDF = async (req, res) => {
             });
         }
 
-        // Get user data
         const user = await User.findByPk(req.user.userId);
 
-        // Generate PDF and save locally
         const pdfData = await pdfService.generateAndSavePDF(invoice, user, invoice.client);
 
-        // Update invoice with PDF data
         await invoice.update({
             pdf_url: pdfData.pdf_url,
             pdf_filename: pdfData.pdf_filename,
             pdf_public_id: pdfData.pdf_public_id
         });
 
-        // Check if there was an error during Cloudinary upload
         if (pdfData.error) {
             return res.json({
                 success: true,
@@ -399,12 +377,10 @@ const generatePDF = async (req, res) => {
     }
 };
 
-// View PDF (secure access)
 const viewPDF = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Get invoice
         const invoice = await Invoice.findOne({
             where: { id, user_id: req.user.userId }
         });
@@ -424,17 +400,13 @@ const viewPDF = async (req, res) => {
             pdf_url_length: invoice.pdf_url ? invoice.pdf_url.length : 0
         });
 
-        // Check if PDF exists - prioritize Cloudinary URLs, fallback to local files
         if (invoice.pdf_url && invoice.pdf_url.includes('cloudinary')) {
-            // Cloudinary URL - redirect to Cloudinary
             console.log('Redirecting to Cloudinary URL:', invoice.pdf_url);
             return res.redirect(invoice.pdf_url);
         } else if (invoice.pdf_url && invoice.pdf_url.startsWith('http')) {
-            // Any other HTTP URL - redirect to it
             console.log('Redirecting to external URL:', invoice.pdf_url);
             return res.redirect(invoice.pdf_url);
         } else if (invoice.pdf_filename) {
-            // Local file - serve from local storage
             const fileExists = await pdfService.pdfExists(invoice.pdf_filename);
             
             if (!fileExists) {
@@ -449,7 +421,6 @@ const viewPDF = async (req, res) => {
                 });
             }
 
-            // Get file path and send PDF
             const filePath = pdfService.getPDFFilePath(invoice.pdf_filename);
             console.log('Serving local PDF file:', filePath);
             res.sendFile(filePath);
@@ -477,12 +448,10 @@ const viewPDF = async (req, res) => {
     }
 };
 
-// Serve PDF directly (bypass Cloudinary security issues)
 const servePDFDirect = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Get invoice
         const invoice = await Invoice.findOne({
             where: { id, user_id: req.user.userId }
         });
@@ -494,7 +463,6 @@ const servePDFDirect = async (req, res) => {
             });
         }
 
-        // Check if local PDF file exists
         if (invoice.pdf_filename) {
             const fileExists = await pdfService.pdfExists(invoice.pdf_filename);
             
@@ -502,7 +470,6 @@ const servePDFDirect = async (req, res) => {
                 const filePath = pdfService.getPDFFilePath(invoice.pdf_filename);
                 console.log('Serving PDF directly from local file:', filePath);
                 
-                // Set headers for PDF download/view
                 res.setHeader('Content-Type', 'application/pdf');
                 res.setHeader('Content-Disposition', `inline; filename="${invoice.invoice_number}.pdf"`);
                 
@@ -525,7 +492,6 @@ const servePDFDirect = async (req, res) => {
     }
 };
 
-// Update invoice status
 const updateInvoiceStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -563,7 +529,6 @@ const updateInvoiceStatus = async (req, res) => {
     }
 };
 
-// Delete invoice
 const deleteInvoice = async (req, res) => {
     try {
         const { id } = req.params;
@@ -579,10 +544,8 @@ const deleteInvoice = async (req, res) => {
             });
         }
 
-        // Delete invoice items first
         await InvoiceItem.destroy({ where: { invoice_id: id } });
 
-        // Delete invoice
         await invoice.destroy();
 
         res.json({
@@ -600,7 +563,6 @@ const deleteInvoice = async (req, res) => {
     }
 };
 
-// Check if PDF exists for invoice
 const checkPDFStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -642,7 +604,6 @@ const checkPDFStatus = async (req, res) => {
     }
 };
 
-// Debug endpoint to check invoice PDF status
 const debugInvoicePDF = async (req, res) => {
     try {
         const { id } = req.params;
@@ -658,7 +619,6 @@ const debugInvoicePDF = async (req, res) => {
             });
         }
 
-        // Check if local file exists
         let localFileExists = false;
         if (invoice.pdf_filename) {
             localFileExists = await pdfService.pdfExists(invoice.pdf_filename);
@@ -690,12 +650,10 @@ const debugInvoicePDF = async (req, res) => {
     }
 };
 
-// Test PDF generation and upload
 const testPDFGeneration = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Get invoice with all related data
         const invoice = await Invoice.findOne({
             where: { id, user_id: req.user.userId },
             include: [
@@ -717,28 +675,22 @@ const testPDFGeneration = async (req, res) => {
             });
         }
 
-        // Get user data
         const user = await User.findByPk(req.user.userId);
 
         console.log('Testing PDF generation for invoice:', invoice.invoice_number);
 
-        // Test HTML generation
         const html = await pdfService.createInvoiceHTML(invoice, user, invoice.client);
         console.log('HTML generated, length:', html.length);
 
-        // Test PDF generation
         const pdfBuffer = await pdfService.generatePDF(html);
         console.log('PDF generated, size:', pdfBuffer.length, 'bytes');
 
-        // Test local save
         const fileInfo = await pdfService.savePDFLocally(pdfBuffer, invoice.invoice_number);
         console.log('PDF saved locally:', fileInfo.fileName);
 
-        // Test Cloudinary upload
         const cloudinaryResult = await pdfService.uploadToCloudinary(pdfBuffer, invoice.invoice_number);
         console.log('Cloudinary upload result:', cloudinaryResult);
 
-        // Update invoice with new PDF data
         await invoice.update({
             pdf_url: cloudinaryResult.secure_url,
             pdf_filename: fileInfo.fileName,
