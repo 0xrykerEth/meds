@@ -26,12 +26,10 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Generate JWT token
 const generateToken = (userId) => {
     return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
 };
 
-// Optional authentication middleware (for routes that can work with or without auth)
 const optionalAuth = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -48,7 +46,6 @@ const optionalAuth = async (req, res, next) => {
         }
         next();
     } catch (error) {
-        // Continue without authentication
         next();
     }
 };
